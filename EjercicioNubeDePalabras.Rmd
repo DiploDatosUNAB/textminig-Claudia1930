@@ -9,11 +9,17 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 
 # Cargar las librerías necesarias
-library(__________) #Para usar dplyr
-library(__________) #Para usar tidytext
+library(dplyr) #Para usar dplyr
+library(tidytext) #Para usar tidytext
 library(wordcloud2)
 library(tm)
 library(readr)
+library(purrr)
+library(remotes)
+library(learnr)
+library(readr)
+library(tidyverse)
+library(tibble)
 ```
 
 ## Nube de Palabras
@@ -25,8 +31,8 @@ Tenemos en el archivo `rladies_meetup.csv` los títulos de los eventos de R-Ladi
 EL primer paso es leer el archivo que tiene todos los titulos de meetups de r-ladies. **Completen este código para que se lea el archivo "rladies_meetups.csv"**
 
 ```{r}
-titulos <- ________("rladies_meetups.csv")
-
+titulos <- read_csv("rladies_meetups.csv")
+titulos
 ```
 
 Ahora necesitamos filtrar **stop words** en varios idiomas (porque no solo hay capítulos en Español).
@@ -42,7 +48,7 @@ variosIdiomas_stop_words <- idiomas %>%
   gather(var, word) %>%
   bind_rows(stop_words) %>%
   select(word, lexicon)
-
+variosIdiomas_stop_words
 ```
 
 Ahora tenemos que obtener solo palabras, asi que vamos a :
@@ -57,18 +63,18 @@ Completa el código para poder obtener el conjunto de datos `palabras` para lueg
   
 ```{r}
 palabras <- titulos %>%
-  _____________(word, titulo) %>%
-  _____________(variosIdiomas_stop_words) %>%
+  unnest_tokens(word, ";titulo") %>%
+ anti_join(variosIdiomas_stop_words) %>%
   count(word) %>%
-  _____________(n>10)
+  filter(n>10)
 
-
+palabras
 ```
 
 Agregamos el código para visualizar el set de datos, las primeras 15 filas.
 
 ```{r}
-________(palabras, n=________)
+print(palabras, n=15)
 
 ```
 
@@ -76,7 +82,7 @@ ________(palabras, n=________)
 Con las palabras finales seleccionadas armamos una nube de palabras. Completa el código para poder obtener una nube de palabras. Aquí si queremos que se muestre el resultado.
 
 ```{r}
-___________ (__________ , size = 1, minRotation = -pi/6, maxRotation = -pi/6,
+wordcloud2(palabras , size = 1, minRotation = -pi/6, maxRotation = -pi/6,
                   color = "random-light", backgroundColor = "grey")
 
 ```
